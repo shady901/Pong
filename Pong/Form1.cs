@@ -14,14 +14,18 @@ namespace Pong
 {
     public partial class Frm_Pong : Form
     {
-        static float playerMoveSpeed = 5f;
+        int round;
+        int player1Points,player2Points;
+        static int playerMoveSpeed = 5;
         static Keys key;
         Random direction = new Random();
         static int ballSpeed = 10;
         int currentLeft;
          int currentTop;
        public Rectangle ball =new Rectangle(350,300, 20, 20);
-        bool roundStart = true;
+        bool startRound = true;
+
+
         public Frm_Pong()
         {
             InitializeComponent();
@@ -39,10 +43,11 @@ namespace Pong
         private void Update_Tick(object sender, EventArgs e)
         {
             this.CreateGraphics().Clear(Frm_Pong.ActiveForm.BackColor);
+            PointManager();
+            UpdateText();
             PlayerMovement();
             WallCheck();
             BallMovement();
-            
             Draw();
            
         }
@@ -83,24 +88,11 @@ namespace Pong
             }
             else if (currentTop == 3)
             {
-                ball.Y = ball.Y;
+                ball.Y = ball.Y; // y axis movement
             }
 
-            //when round start random direction
-            if (roundStart)
-            {
-                if (direction.Next(1, 3) == 1)
-                {
-                    currentLeft = 1;
-                }
-                else
-                {
-                    currentLeft = 2;
-                }
-
-                roundStart = false;
-            }
-          
+         
+           
                 //checks if ball is on the same x axis
             if ((ball.Location.X<pb_player1.Right))
             {
@@ -111,7 +103,7 @@ namespace Pong
                     {
                         currentTop = 2;
                     }
-                    else if (((ball.Location.Y <= pb_player1.Location.Y + Height) && (ball.Location.Y >= pb_player1.Location.Y + Height - 36)))
+                    else if (((ball.Location.Y <= pb_player1.Location.Y + pb_player1.Height) && (ball.Location.Y >= pb_player1.Location.Y + pb_player1.Height - 36)))
                     {
                         currentTop = 1;
                     }
@@ -127,7 +119,7 @@ namespace Pong
                     {
                         currentTop = 2;
                     }
-                    else if (((ball.Location.Y <= pb_player2.Location.Y + Height) && (ball.Location.Y >= pb_player2.Location.Y + Height - 36)))
+                    else if (((ball.Location.Y <= pb_player2.Location.Y + pb_player2.Height) && (ball.Location.Y >= pb_player2.Location.Y + pb_player2.Height - 36)))
                     {
                         currentTop = 1;
                     }
@@ -148,19 +140,53 @@ namespace Pong
                 {
                     currentTop = 1;
                 }
-                else
-                {
-                    currentTop = 3;
-                }
-                
+               
             }
 
-          
+            
 
 
 
         }
 
+        public void PointManager()
+        {
+            RoundStart();
+            if (ball.Location.X <= 0)
+            {
+                player2Points++;
+                startRound = true;
+
+            }
+            else if (ball.Location.X >= 780)
+            {
+                player1Points++;
+                startRound = true;
+            }
+        }
+
+        public void RoundStart()
+        {
+            if (startRound)
+            {
+                round++;
+                //when round start random direction
+                ball.Y = 300;
+                ball.X = 350;
+                if (direction.Next(1, 3) == 1)
+                {
+                    currentLeft = 1;
+                }
+                else
+                {
+                    currentLeft = 2;
+                }
+                startRound = false;
+            }
+               
+        }
+            
+        
 
         public void BallChangeInDirection()
         {
@@ -184,10 +210,7 @@ namespace Pong
             {
                 currentTop = 1;
             }
-            else
-            {
-                currentTop = 3;
-            }
+           
         }
 
         private void PlayerMovement()
@@ -196,11 +219,11 @@ namespace Pong
             if (Keys.W==key)
             {
                 
-                pb_player1.Top -= (int)playerMoveSpeed;
+                pb_player1.Top -= playerMoveSpeed;
             }
             if (Keys.S == key)
             {
-                pb_player1.Top += (int)playerMoveSpeed;
+                pb_player1.Top += playerMoveSpeed;
             }
 
 
@@ -208,11 +231,11 @@ namespace Pong
             if (Keys.NumPad8 == key)
             {
 
-                pb_player2.Top -= (int)playerMoveSpeed;
+                pb_player2.Top -= playerMoveSpeed;
             }
             if (Keys.NumPad5 == key)
             {
-                pb_player2.Top += (int)playerMoveSpeed;
+                pb_player2.Top += playerMoveSpeed;
             }
 
 
@@ -242,10 +265,15 @@ namespace Pong
 
         private void Frm_Pong_KeyDown(object sender, KeyEventArgs e)
         {
-          key = e.KeyCode;
-            
+          key = e.KeyCode;            
+        }
+        public void UpdateText()
+        {
+            lbl_player1.Text = Convert.ToString("Player 1: " + player1Points);
+            lbl_player2.Text = Convert.ToString("Player 2: " + player2Points);
+            lbl_Round.Text = Convert.ToString("ROUND: " + round);
+
         }
 
-       
     }
 }
